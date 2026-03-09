@@ -24,9 +24,12 @@ RUN apt-get update && apt-get install -y \
     git \
     python3 \
     python3-dev \
-    isolinux \
-    syslinux-utils \
-    genisoimage \
+    grub-common \
+    grub-pc-bin \
+    grub-efi-amd64-bin \
+    mtools \
+    xorriso \
+    libisoburn-dev \
     sudo \
     && rm -rf /var/lib/apt/lists/*
 

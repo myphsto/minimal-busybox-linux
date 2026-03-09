@@ -1,27 +1,27 @@
 # minimal-busybox-linux
 
-A minimal Linux distribution build system for creating lightweight Linux environments using BusyBox and a custom kernel configuration.
+A minimal Linux distribution build system for creating lightweight Linux environments using BusyBox and a custom kernel configuration. Now with **Hybrid BIOS/UEFI** support.
 
 ## Overview
 
 This project builds a complete Linux system from scratch using:
-- **Linux Kernel 6.6.58**: Minimal configuration with essential features
+- **Linux Kernel 6.17**: Minimal configuration with EFI support
 - **BusyBox 1.36.1**: Provides ~300 Unix utilities in a single static binary
-- **Custom Init Script**: Shell script at `/init` that runs as PID 1 and uses BusyBox commands
-- **Docker Build Environment**: Ensures reproducible builds across platforms
+- **Custom Init Script**: Shell script at `/init` that runs as PID 1
+- **GRUB2 Bootloader**: Configured for both Legacy BIOS and UEFI
+- **Docker Build Environment**: Ensures reproducible builds across platforms (macOS/Linux)
 
-**Final Result**: ~15-25MB bootable ISO with full Linux functionality
-
-**How init works**: The kernel boots and executes `/init` (a shell script from `config/system/init.sh`), which then uses BusyBox utilities (`/bin/mount`, `/bin/sh`, etc.) to set up the system. BusyBox includes an init applet, but we use a custom shell script instead for simplicity.
+**Final Result**: ~20-30MB bootable Hybrid ISO with full Linux functionality.
 
 ## Features
 
+- **Hybrid BIOS/UEFI support**: Boots on almost any x86_64 hardware
+- **Stealth Boot**: Instant direct-to-shell boot (zero timeout)
+- **Cross-Platform**: Built in Docker, tested on macOS and Linux
 - **Minimal footprint**: Built with only essential components
-- **Educational**: Perfect for learning Linux internals and system building
 - **Fast boot**: Optimized kernel configuration for quick startup (~3-5 seconds)
 - **Reproducible builds**: Docker-based build environment ensures consistency
-- **Modular design**: Separate kernel, rootfs, and toolchain builds
-- **Local testing**: QEMU integration for rapid development cycles
+- **Local testing**: QEMU integration with UEFI (OVMF) support
 
 ## Quick Start
 
@@ -32,8 +32,13 @@ This project builds a complete Linux system from scratch using:
 
 2. **Test locally with QEMU:**
    ```bash
-   make test          # GUI mode - graphical window
-   make test-headless # Console mode - serial output in terminal
+   # BIOS Mode (Default)
+   make test          # GUI mode
+   make test-headless # Console mode
+
+   # UEFI Mode
+   ./scripts/test-scripts/test-local.sh --uefi
+   ./scripts/test-scripts/test-headless.sh --uefi
    ```
 
    **QEMU Controls:**
@@ -81,8 +86,8 @@ This project builds a complete Linux system from scratch using:
    ↓
 5. Build ISO
    - Combine kernel + initramfs
-   - Add ISOLINUX bootloader
-   - Create hybrid ISO (CD/USB bootable)
+   - Add GRUB2 bootloader (Hybrid BIOS/UEFI)
+   - Create hybrid ISO using grub-mkrescue
    - Output: minimal-busybox-linux.iso
 ```
 
@@ -124,7 +129,8 @@ minimal-busybox-linux/
 │   └── test-scripts/      # QEMU test scripts
 │       ├── test-local.sh     # GUI mode testing
 │       └── test-headless.sh  # Headless mode testing
-├── src/                   # Source patches (currently unused)
+├── src/                   # Source files and customization
+│   ├── rootfs/            # Files to be merged into the root filesystem
 │   └── patches/           # Kernel/BusyBox patches
 └── output/                # Final build outputs
     ├── vmlinuz            # Compiled kernel
@@ -145,7 +151,7 @@ minimal-busybox-linux/
 ### Build Versions
 Edit `.env` to change package versions:
 ```bash
-KERNEL_VERSION=6.6.58   # Linux kernel version
+KERNEL_VERSION=6.17     # Linux kernel version
 BUSYBOX_VERSION=1.36.1  # BusyBox version
 ```
 

@@ -72,11 +72,11 @@ iso: kernel rootfs
 
 test:
 	@echo "Testing ISO with QEMU (GUI mode)..."
-	./scripts/test-scripts/test-local.sh
+	./scripts/test-scripts/test-local.sh $(ARGS)
 
 test-headless:
 	@echo "Testing ISO with QEMU (headless mode)..."
-	./scripts/test-scripts/test-headless.sh
+	./scripts/test-scripts/test-headless.sh $(ARGS)
 
 clean:
 	@echo "Cleaning build artifacts..."

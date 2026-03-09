@@ -1,14 +1,26 @@
 # Build artifacts
 build/
 output/
-src/
 
-# Docker volumes
+# Source and volumes
+src/
 .docker/
+
+# Environment files
+.env
+!.env.example
 
 # Temporary files
 *.tmp
 *.log
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # Downloaded source archives
 *.tar.*

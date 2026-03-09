@@ -19,6 +19,7 @@ print_msg "Mounting essential filesystems..."
 
 # Create additional device nodes if needed
 [ -c /dev/console ] || /bin/mknod /dev/console c 5 1
+[ -c /dev/tty ] || /bin/mknod /dev/tty c 5 0
 [ -c /dev/null ] || /bin/mknod /dev/null c 1 3
 [ -c /dev/zero ] || /bin/mknod /dev/zero c 1 5
 [ -c /dev/random ] || /bin/mknod /dev/random c 1 8
@@ -47,5 +48,6 @@ setsid /bin/sh -c 'exec /bin/sh </dev/tty1 >/dev/tty1 2>&1' &
 
 # Start interactive shell on main console (serial port)
 # This is used for headless mode and serial console
+# setsid + cttyhack ensures the shell has a controlling terminal for job control
 print_msg "Starting shell on console..."
-exec /bin/sh < /dev/console > /dev/console 2>&1
+exec setsid cttyhack /bin/sh
