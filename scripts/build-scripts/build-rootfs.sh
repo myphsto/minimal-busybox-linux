@@ -53,6 +53,12 @@ cp -r _install/* ${ROOTFS_DIR}/
 cd ${ROOTFS_DIR}
 mkdir -p dev proc sys tmp var/log etc/init.d
 
+# Merge custom rootfs files if they exist
+if [ -d "/build/src/rootfs" ]; then
+    echo "Merging custom rootfs files from src/rootfs..."
+    cp -r /build/src/rootfs/* ${ROOTFS_DIR}/
+fi
+
 # Option 1: Use custom init script (current default)
 # This gives you full control over the boot process with a simple shell script
 cp /build/config/system/init.sh init
