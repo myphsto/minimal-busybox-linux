@@ -81,6 +81,7 @@ test-headless:
 clean:
 	@echo "Cleaning build artifacts..."
 	rm -rf $(BUILD_DIR)/* $(OUTPUT_DIR)/*
+	rm -rf /build/cache/*
 	docker rmi $(DOCKER_IMAGE) 2>/dev/null || true
 
 help:

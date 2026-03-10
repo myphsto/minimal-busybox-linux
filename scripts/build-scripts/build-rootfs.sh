@@ -59,38 +59,10 @@ if [ -d "/build/src/rootfs" ]; then
     cp -r /build/src/rootfs/* ${ROOTFS_DIR}/
 fi
 
-# Option 1: Use custom init script (current default)
+# Use custom init script (current default)
 # This gives you full control over the boot process with a simple shell script
 cp /build/config/system/init.sh init
 chmod +x init
-
-# Option 2: Use BusyBox's init system (commented out)
-# Uncomment the lines below and comment out Option 1 to use BusyBox's init
-# This requires creating an /etc/inittab configuration file
-#
-# Create /etc/inittab for BusyBox init
-# cat > etc/inittab << 'EOF'
-# ::sysinit:/etc/init.d/rcS
-# ::respawn:/bin/sh
-# ::ctrlaltdel:/sbin/reboot
-# ::shutdown:/bin/umount -a -r
-# EOF
-#
-# Create /etc/init.d/rcS startup script
-# mkdir -p etc/init.d
-# cat > etc/init.d/rcS << 'EOF'
-# #!/bin/sh
-# # Mount essential filesystems
-# mount -t proc proc /proc
-# mount -t sysfs sysfs /sys
-# mount -t devtmpfs devtmpfs /dev
-# # Set hostname
-# hostname minimal-linux
-# EOF
-# chmod +x etc/init.d/rcS
-#
-# Note: BusyBox init requires kernel to pass init=/sbin/init
-# You'll need to update build-iso.sh to change init=/init to init=/sbin/init
 
 # Create basic /etc/passwd
 cat > etc/passwd << 'EOF'

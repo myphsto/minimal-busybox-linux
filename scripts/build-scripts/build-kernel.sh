@@ -15,9 +15,12 @@ fi
 BUILD_DIR="/build/build/kernel"
 CONFIG_DIR="/build/config/kernel"
 OUTPUT_DIR="/build/output"
+CACHE_DIR="/build/cache"
+CACHE_TTL=86400 # 24 hours in seconds
 
 # Ensure output directory exists and has correct permissions
 mkdir -p ${OUTPUT_DIR}
+mkdir -p ${CACHE_DIR}
 
 echo "Building Linux kernel ${KERNEL_VERSION}..."
 
@@ -25,10 +28,41 @@ echo "Building Linux kernel ${KERNEL_VERSION}..."
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
 
-# Download kernel source if not present
-if [ ! -d "linux-${KERNEL_VERSION}" ]; then
+# Check if we have a cached version that's not expired
+CACHE_FILE="${CACHE_DIR}/linux-${KERNEL_VERSION}.tar.xz"
+if [ -f "${CACHE_FILE}" ] && [ -d "linux-${KERNEL_VERSION}" ]; then
+    # Check if the cache is less than 24 hours old
+    CACHE_AGE=$(($(date +%s) - $(stat -c %Y "${CACHE_FILE}")))
+    if [ ${CACHE_AGE} -lt ${CACHE_TTL} ]; then
+        echo "Using cached kernel source for ${KERNEL_VERSION}"
+        # Extract from cache (only if not already extracted)
+        if [ ! -d "linux-${KERNEL_VERSION}" ]; then
+            echo "Extracting kernel from cache..."
+            tar xf "${CACHE_FILE}"
+        fi
+    else
+        echo "Cached kernel is expired, downloading fresh"
+        rm -f "${CACHE_FILE}"
+        # Download and cache fresh copy
+        echo "Downloading Linux kernel ${KERNEL_VERSION}..."
+        wget -q https://cdn.kernel.org/pub/linux/kernel/v$(echo ${KERNEL_VERSION} | cut -d. -f1).x/linux-${KERNEL_VERSION}.tar.xz
+        
+        # Cache the download
+        cp linux-${KERNEL_VERSION}.tar.xz "${CACHE_FILE}"
+        
+        echo "Extracting kernel..."
+        tar -xf linux-${KERNEL_VERSION}.tar.xz
+        rm linux-${KERNEL_VERSION}.tar.xz
+    fi
+else
+    # Download and cache fresh copy if no cache or invalid cache
     echo "Downloading Linux kernel ${KERNEL_VERSION}..."
     wget -q https://cdn.kernel.org/pub/linux/kernel/v$(echo ${KERNEL_VERSION} | cut -d. -f1).x/linux-${KERNEL_VERSION}.tar.xz
+    
+    # Cache the download
+    cp linux-${KERNEL_VERSION}.tar.xz "${CACHE_FILE}"
+    
+    echo "Extracting kernel..."
     tar -xf linux-${KERNEL_VERSION}.tar.xz
     rm linux-${KERNEL_VERSION}.tar.xz
 fi

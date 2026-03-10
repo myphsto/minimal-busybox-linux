@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# This init script sets up the basic system environment
-
 export PATH="/bin:/sbin:/usr/bin:/usr/sbin"
 
 # Function to print colored output
@@ -43,11 +41,8 @@ print_msg "minimal Linux system ready!"
 print_msg "Available commands: $(ls /bin | tr '\n' ' ')"
 
 # Start shell on tty1 (VGA console) for GUI/keyboard access
-# This allows keyboard input to work in QEMU GUI mode
 setsid /bin/sh -c 'exec /bin/sh </dev/tty1 >/dev/tty1 2>&1' &
 
 # Start interactive shell on main console (serial port)
-# This is used for headless mode and serial console
-# setsid + cttyhack ensures the shell has a controlling terminal for job control
 print_msg "Starting shell on console..."
 exec setsid cttyhack /bin/sh
