@@ -18,6 +18,8 @@ get_ovmf_path() {
     local common_paths=(
         "/usr/share/ovmf/OVMF.fd"
         "/usr/share/edk2-ovmf/x64/OVMF.fd"
+        "/usr/share/OVMF/OVMF_CODE.fd"
+        "/usr/share/edk2/ovmf/OVMF_CODE.fd"
     )
 
     if [ -n "$brew_prefix" ]; then

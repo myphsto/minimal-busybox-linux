@@ -14,17 +14,40 @@ fi
 PROJECT_ROOT="${PROJECT_ROOT:-/build}"
 BUILD_DIR="${PROJECT_ROOT}/build/rootfs"
 OUTPUT_DIR="${PROJECT_ROOT}/output"
+CACHE_DIR="${PROJECT_ROOT}/cache"
+CACHE_TTL=86400 # 24 hours
+
+mkdir -p ${CACHE_DIR}
 
 echo "Building minimal root filesystem with BusyBox ${BUSYBOX_VERSION}..."
 
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
 
+CACHE_FILE="${CACHE_DIR}/busybox-${BUSYBOX_VERSION}.tar.bz2"
+
+if [ -f "${CACHE_FILE}" ]; then
+    CACHE_AGE=$(($(date +%s) - $(stat -c %Y "${CACHE_FILE}")))
+    if [ ${CACHE_AGE} -lt ${CACHE_TTL} ]; then
+        echo "Using cached BusyBox source: ${CACHE_FILE}"
+    else
+        echo "Cached BusyBox expired, redownloading..."
+        rm -f "${CACHE_FILE}"
+    fi
+fi
+
 if [ ! -d "busybox-${BUSYBOX_VERSION}" ]; then
-    echo "Downloading BusyBox ${BUSYBOX_VERSION}..."
-    wget -q https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2
-    tar -xf busybox-${BUSYBOX_VERSION}.tar.bz2
-    rm busybox-${BUSYBOX_VERSION}.tar.bz2
+    if [ -f "${CACHE_FILE}" ]; then
+        echo "Extracting BusyBox from cache..."
+        tar -xf "${CACHE_FILE}"
+    else
+        echo "Downloading BusyBox ${BUSYBOX_VERSION}..."
+        wget -q https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2
+        cp busybox-${BUSYBOX_VERSION}.tar.bz2 "${CACHE_FILE}"
+        echo "Extracting BusyBox..."
+        tar -xf busybox-${BUSYBOX_VERSION}.tar.bz2
+        rm busybox-${BUSYBOX_VERSION}.tar.bz2
+    fi
 fi
 
 cd busybox-${BUSYBOX_VERSION}

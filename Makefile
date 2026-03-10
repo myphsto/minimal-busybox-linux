@@ -19,6 +19,7 @@ CONFIG_DIR := $(CURDIR)/config
 SCRIPTS_DIR := $(CURDIR)/scripts
 SRC_DIR := $(CURDIR)/src
 OUTPUT_DIR := $(CURDIR)/output
+CACHE_DIR := $(CURDIR)/cache
 
 DOCKER_IMAGE := minimal-busybox-linux-builder
 DOCKER_RUN := docker run --rm -v $(CURDIR):/build --user $(shell id -u):$(shell id -g) \
@@ -26,7 +27,7 @@ DOCKER_RUN := docker run --rm -v $(CURDIR):/build --user $(shell id -u):$(shell 
 	-e BUSYBOX_VERSION=$(BUSYBOX_VERSION) \
 	$(DOCKER_IMAGE)
 
-.PHONY: all clean docker-build kernel rootfs iso test test-headless
+.PHONY: all clean clean-all docker-build kernel rootfs iso test test-headless
 
 docker-build:
 	@echo "Building Docker build environment..."
@@ -72,8 +73,11 @@ test-headless:
 clean:
 	@echo "Cleaning build artifacts..."
 	rm -rf $(BUILD_DIR)/* $(OUTPUT_DIR)/*
-	rm -rf /build/cache/*
 	docker rmi $(DOCKER_IMAGE) 2>/dev/null || true
+
+clean-all: clean
+	@echo "Cleaning cache..."
+	rm -rf $(CACHE_DIR)/*
 
 help:
 	@echo "Available targets:"
@@ -82,7 +86,8 @@ help:
 	@echo "  rootfs        - Build root filesystem only"
 	@echo "  test          - Test ISO with QEMU (GUI mode)"
 	@echo "  test-headless - Test ISO with QEMU (headless mode)"
-	@echo "  clean         - Clean all build artifacts"
+	@echo "  clean         - Clean build artifacts"
+	@echo "  clean-all     - Clean build artifacts and download cache"
 	@echo "  help          - Show this help message"
 	@echo ""
 	@echo "Configuration:"

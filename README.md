@@ -59,7 +59,8 @@ This project builds a complete Linux system from scratch using:
 | `make rootfs` | Build root filesystem only |
 | `make test` | Test ISO with QEMU (GUI mode) |
 | `make test-headless` | Test ISO with QEMU (console mode) |
-| `make clean` | Clean all build artifacts |
+| `make clean` | Clean build artifacts |
+| `make clean-all` | Clean build artifacts and download cache |
 | `make help` | Show all available targets |
 
 ## How It Works
@@ -259,11 +260,12 @@ Edit `scripts/build-scripts/build-iso.sh` and change boot parameters to include 
 **Access QEMU monitor:**
 In QEMU GUI: Ctrl+Alt+2 (Ctrl+Alt+1 to return to VM)
 
-### Kernel Caching
+### Source Caching
 
-The build system implements a kernel caching mechanism:
-- Cache is stored in `/build/cache` directory
-- Both `make clean` and `make clean-all` remove cached downloads to ensure fresh builds
+The build system implements a caching mechanism for source downloads:
+- Cache is stored in the `cache/` directory
+- `make clean` preserves the cache for faster rebuilds
+- `make clean-all` removes cached downloads to ensure fresh source fetching
 
 ## Use Cases
 

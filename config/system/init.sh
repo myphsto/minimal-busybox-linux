@@ -8,6 +8,9 @@ print_msg() {
 
 print_msg "Starting minimal Linux system..."
 
+# Set hostname
+hostname minimal-linux
+
 /bin/mount -t proc proc /proc
 /bin/mount -t sysfs sysfs /sys
 /bin/mount -t devtmpfs devtmpfs /dev
