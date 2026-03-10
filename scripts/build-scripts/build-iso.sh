@@ -12,15 +12,16 @@ if [ -z "$KERNEL_VERSION" ]; then
     exit 1
 fi
 
-BUILD_DIR="/build/build"
-OUTPUT_DIR="/build/output"
-ISO_DIR="/build/build/iso_root"
+# Use environment variable or default to /build (Docker default)
+PROJECT_ROOT="${PROJECT_ROOT:-/build}"
+BUILD_DIR="${PROJECT_ROOT}/build"
+OUTPUT_DIR="${PROJECT_ROOT}/output"
+ISO_DIR="${PROJECT_ROOT}/build/iso_root"
 
 echo "Creating bootable hybrid BIOS/UEFI ISO image..."
 
-# Check if kernel and initramfs exist in build directories
-KERNEL_FILE="/build/build/kernel/linux-${KERNEL_VERSION}/arch/x86/boot/bzImage"
-INITRAMFS_FILE="/build/build/rootfs/initramfs.gz"
+KERNEL_FILE="${BUILD_DIR}/kernel/linux-${KERNEL_VERSION}/arch/x86/boot/bzImage"
+INITRAMFS_FILE="${BUILD_DIR}/rootfs/initramfs.gz"
 
 if [ ! -f "${KERNEL_FILE}" ]; then
     echo "Error: Kernel not found at ${KERNEL_FILE}. Run 'make kernel' first."
@@ -32,19 +33,15 @@ if [ ! -f "${INITRAMFS_FILE}" ]; then
     exit 1
 fi
 
-# Create ISO directory structure
 rm -rf ${ISO_DIR}
 mkdir -p ${ISO_DIR}/boot/grub
 mkdir -p ${BUILD_DIR}/iso
 
-# Copy kernel and initramfs from build directories
 cp ${KERNEL_FILE} ${ISO_DIR}/boot/vmlinuz
 cp ${INITRAMFS_FILE} ${ISO_DIR}/boot/initramfs.gz
 
-# Copy GRUB configuration
-cp /build/config/system/grub.cfg ${ISO_DIR}/boot/grub/grub.cfg
+cp ${PROJECT_ROOT}/config/system/grub.cfg ${ISO_DIR}/boot/grub/grub.cfg
 
-# Create ISO image using grub-mkrescue
 echo "Generating hybrid ISO image with grub-mkrescue..."
 grub-mkrescue -o ${BUILD_DIR}/iso/minimal-busybox-linux.iso ${ISO_DIR}
 

@@ -34,40 +34,31 @@ docker-build:
 
 kernel: docker-build
 	@echo "Building Linux kernel $(KERNEL_VERSION)..."
-	$(DOCKER_RUN) bash /build/scripts/build-scripts/build-kernel.sh
-	@echo "Copying kernel to output directory..."
+	@$(DOCKER_RUN) bash /build/scripts/build-scripts/build-kernel.sh
 	@mkdir -p $(OUTPUT_DIR)
 	@if [ -f $(BUILD_DIR)/kernel/linux-$(KERNEL_VERSION)/arch/x86/boot/bzImage ]; then \
 		cp $(BUILD_DIR)/kernel/linux-$(KERNEL_VERSION)/arch/x86/boot/bzImage $(OUTPUT_DIR)/vmlinuz; \
-		echo "Kernel copied to $(OUTPUT_DIR)/vmlinuz"; \
 	else \
-		echo "Error: Kernel not found"; \
-		exit 1; \
+		echo "Error: Kernel not found"; exit 1; \
 	fi
 
 rootfs: docker-build
 	@echo "Building minimal root filesystem..."
-	$(DOCKER_RUN) bash /build/scripts/build-scripts/build-rootfs.sh
-	@echo "Copying initramfs to output directory..."
+	@$(DOCKER_RUN) bash /build/scripts/build-scripts/build-rootfs.sh
 	@mkdir -p $(OUTPUT_DIR)
 	@if [ -f $(BUILD_DIR)/rootfs/initramfs.gz ]; then \
 		cp $(BUILD_DIR)/rootfs/initramfs.gz $(OUTPUT_DIR)/initramfs.gz; \
-		echo "Initramfs copied to $(OUTPUT_DIR)/initramfs.gz"; \
 	else \
-		echo "Error: Initramfs not found"; \
-		exit 1; \
+		echo "Error: Initramfs not found"; exit 1; \
 	fi
 
 iso: kernel rootfs
 	@echo "Creating bootable ISO image..."
-	$(DOCKER_RUN) bash /build/scripts/build-scripts/build-iso.sh
-	@echo "Copying ISO to output directory..."
+	@$(DOCKER_RUN) bash /build/scripts/build-scripts/build-iso.sh
 	@if [ -f $(BUILD_DIR)/iso/minimal-busybox-linux.iso ]; then \
 		cp $(BUILD_DIR)/iso/minimal-busybox-linux.iso $(OUTPUT_DIR)/minimal-busybox-linux.iso; \
-		echo "ISO copied to $(OUTPUT_DIR)/minimal-busybox-linux.iso"; \
 	else \
-		echo "Error: ISO not found"; \
-		exit 1; \
+		echo "Error: ISO not found"; exit 1; \
 	fi
 
 test:
