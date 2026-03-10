@@ -35,6 +35,4 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /build
 
-VOLUME ["/build/src", "/build/output"]
-
 CMD ["/bin/bash"]
