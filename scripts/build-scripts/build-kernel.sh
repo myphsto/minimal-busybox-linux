@@ -27,6 +27,11 @@ cd ${BUILD_DIR}
 if [ ! -d "linux-${KERNEL_VERSION}" ]; then
     echo "Downloading Linux kernel ${KERNEL_VERSION}..."
     wget -q https://cdn.kernel.org/pub/linux/kernel/v$(echo ${KERNEL_VERSION} | cut -d. -f1).x/linux-${KERNEL_VERSION}.tar.xz
+    
+    # Cache the download
+    cp linux-${KERNEL_VERSION}.tar.xz "${CACHE_FILE}"
+    
+    echo "Extracting kernel..."
     tar -xf linux-${KERNEL_VERSION}.tar.xz
     rm linux-${KERNEL_VERSION}.tar.xz
 fi

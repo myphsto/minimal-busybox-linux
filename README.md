@@ -259,6 +259,12 @@ Edit `scripts/build-scripts/build-iso.sh` and change boot parameters to include 
 **Access QEMU monitor:**
 In QEMU GUI: Ctrl+Alt+2 (Ctrl+Alt+1 to return to VM)
 
+### Kernel Caching
+
+The build system implements a kernel caching mechanism:
+- Cache is stored in `/build/cache` directory
+- Both `make clean` and `make clean-all` remove cached downloads to ensure fresh builds
+
 ## Use Cases
 
 **Perfect for:**
